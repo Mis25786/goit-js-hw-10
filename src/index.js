@@ -44,6 +44,7 @@ import debounce from 'lodash.debounce';
 //* імпорт функції fetchCountries  // 2) Винеси її в окремий файл fetchCountries.js і зроби іменований експорт
 import { fetchCountries } from './fetchCountries';
 
+//*====================================
 //* доступ до тегів
 const input = document.getElementById('search-box');
 const countryList = document.querySelector('.country-list');
@@ -54,6 +55,15 @@ const countryInfo = document.querySelector('.country-info');
 //* //todo 6) застосувати прийом Debounce на обробнику події і робити HTTP-запит через 300мс
 input.addEventListener('input', debounce(onLookingForCountry, DEBOUNCE_DELAY));
 //*========================
+//* повертаэ проміс і передаємо далі для обробки
+// export function fetchCountries() {
+//   return fetch(URL, OPTIONS).then(response => response.json());
+// }
+
+fetchCountries().then(countri => createMarkup(countri));
+// .catch(error => alert(error));
+
+//*====================================
 //* приймає данні з інпута //todo 5)  HTTP-запити виконуються при введенні назви країни, тобто на події input
 function onLookingForCountry(e) {
   e.preventDefault();
@@ -61,48 +71,27 @@ function onLookingForCountry(e) {
   console.log(input.value);
 }
 
-//*====================
-
-fetchCountries()
-  .then(countries => {
-    console.log(countries);
-  })
-  .catch(error => {
-    error;
-  });
-//*====================
+// //*====================
 function createMarkup(arr) {
-  const markup = arr.map(
-    item => `<li>
-  <img src="${flags}" alt="Прапор">
-  <h2>${name.official}</h2>
-  <p>${capital}</p>
-  <p>${population}</p>
-  <p>${languages}</p>
-  </li>`
-  );
+  const markup = arr
+    .map(({ name, flags, capital, population, languages }) => {
+      // console.log(el);
+      return `<li>
+      <h2>Name: ${name.official}</h2>
+    <img src="Flag: ${flags.svg}" alt="">
+    <p>Capital: ${capital}</p>
+    <p>Population: ${population}</p>
+    <p>Languages: ${languages.eng}</p>
+    </li>`;
+    })
+    .join('');
 
-  countryInfo.innerHTML = markup.join('');
+  console.log(name);
+  countryInfo.innerHTML = markup;
 }
 
 //*====================
-// const o = fetch('https://restcountries.com/v3.1/name/${input.value}');
-// console.log(o);
-
-// fetch(
-//   'https://restcountries.com/v3.1/all?fields=name,flags,capital,population,languages'
-// )
-//   .then(response => {
-//     // console.log(response.json());
-//     return response.json();
-//   })
-//   .then(cantry => {
-//     console.log(cantry);
-//   })
-//   .catch(error => {
-//     console.log(error);
-//   });
-
+// : { eng, fra }
 //! ВІДПОВІДЬ ФІЛЬТРА
 // Ви можете відфільтрувати вихідні дані свого запиту, щоб включити лише вказані поля.
 // https://restcountries.com/v2/{service}?fields={field},{field},{field}
