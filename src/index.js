@@ -36,8 +36,6 @@
 //?========================================================================
 import './css/styles.css';
 
-const DEBOUNCE_DELAY = 300;
-
 //* //todo 14) Якщо користувач ввів назву країни, якої не існує, бекенд поверне не порожній масив, а помилку
 // овідомлення "Oops, there is no country with that name"
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
@@ -47,67 +45,66 @@ import debounce from 'lodash.debounce';
 
 //* імпорт функції fetchCountries  // 2) Винеси її в окремий файл fetchCountries.js і зроби іменований експорт
 import { fetchCountries } from './fetchCountries';
-// console.log(fetchCountries);
 
+const DEBOUNCE_DELAY = 300;
 //*===================== доступ до тегів =========================================
 const input = document.getElementById('search-box');
 const countryList = document.querySelector('.country-list');
 const countryInfo = document.querySelector('.country-info');
-// console.log(input);
-// console.log(countryList);
-// console.log(countryInfo);
+
 //*===================== слухач на інпут =========================================
 input.addEventListener('input', debounce(onLookingForCountry, DEBOUNCE_DELAY));
-//*========================
-fetchCountries().then(res => console.log(res));
-
-//*====================================
+//*===============================================================================
 function onLookingForCountry(e) {
   //* отримуємо данні з інпута
-  let inputValue = e.target.value.trim();
-  console.log(inputValue);
+  let inputValue = '';
+  inputValue = e.target.value.trim();
+  // console.log(inputValue);
 
-  //* початково задаємо порожні рядки на розмітку
-  countryList.innerHTML = '';
-  countryInfo.innerHTML = '';
-
-  if (inputValue.length === 0) return onFetchError;
+  if (inputValue.length === 0) return; // onFetchError();
 
   fetchCountries(inputValue)
-    .then(countri => console.log(countri))
-    .catch(error => onFetchError(error));
-  // .catch(onFetchError);
+    .then(countri => markupSelectionCountries(countri))
+    .catch(onFetchError);
 }
 //*================= логіка присвоєння розмітки ======================
 function markupSelectionCountries(data) {
+  console.log(data);
   if (data.length === 1) {
-    return createMarkupCountries();
-  } else if (data.length > 1 && data.length >= 10) {
-    return createMarkupCountriInfo();
+    createMarkupCountriInfo(data);
+  } else if (data.length > 1 && data.length <= 10) {
+    createMarkupCountries(data);
+  } else {
+    onFetchInfo();
   }
-  return onFetchError();
 }
 
 //*================= виводимо помилки ================================
-function onFetchInfo(error) {
+function onFetchInfo() {
   Notify.info('Too many matches found. Please enter a more specific name.');
 }
 
-function onFetchError(error) {
+function onFetchError() {
   Notify.failure('Oops, there is no country with that name');
 }
 
 //*==================== розмітка для одної або 10 країн ==============
 function createMarkupCountriInfo(arr) {
+  //* очищаємо сторінку перед новим пошуком
+  countryList.innerHTML = '';
+
   const markup = arr
-    .map(({ name, flags, capital, population, languages, fifa }) => {
+    .map(({ name, flags, capital, population, languages }) => {
       // console.log(el);
       return `<li>
       <h2>Name: ${name.official}</h2>
-    <img src="${flags.svg}" alt="" width="70" heigth="50">
-    <p>Capital: ${capital}</p>
-    <p>Population: ${population}</p>
-    <p>Languages: ${Object.values(languages).join('', '')}</p>
+    <img src="${flags.svg}" alt="${flags.alt}" width="70" heigth="50">
+    <p><span class="style">Capital:</span> ${capital}</p>
+    <p><span class="style">Population:</span> ${population}</p>
+    <p><span class="style">Languages:</span> ${Object.values(languages).join(
+      '',
+      ''
+    )}</p>
     </li>`;
     })
     .join('');
@@ -116,31 +113,18 @@ function createMarkupCountriInfo(arr) {
 }
 
 function createMarkupCountries(arr) {
+  //* очищаємо сторінку перед новим пошуком
+  countryInfo.innerHTML = '';
+
   const markup = arr
-    .map(({ name, flags, capital, population, languages, fifa }) => {
+    .map(({ name, flags }) => {
       // console.log(el);
       return `<li>
       <h2>Name: ${name.official}</h2>
-    <img src="${flags.svg}" alt="" width="70" heigth="50">
+    <img src="${flags.svg}" alt="${flags.alt}" width="70" heigth="50">
     </li>`;
     })
     .join('');
 
   countryList.innerHTML = markup;
 }
-
-//*====================
-// const URL = 'https://restcountries.com/v3.1/name/canada';
-// // const OPTIONS = {
-// //   headers: {
-// //     // option: '?fields=name,flags,capital,population,languages',
-// //     // option: '?fields=name',
-// //     // name: 'name',
-// //   },
-// // };
-
-// //* повертаэ проміс і передаємо далі для обробки
-// fetch(URL)
-//   .then(res => res.json())
-//   .then(data => console.log(data))
-//*=================================================

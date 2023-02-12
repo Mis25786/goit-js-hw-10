@@ -19,3 +19,8 @@ body {
   max-width: 320px;
   margin-bottom: 16px;
 }
+
+.style {
+  color: blue;
+  font-weight: 500;
+}
