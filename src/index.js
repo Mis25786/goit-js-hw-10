@@ -61,6 +61,10 @@ function onLookingForCountry(e) {
   inputValue = e.target.value.trim();
   // console.log(inputValue);
 
+  //* очищаємо сторінку перед новим пошуком і при очищенні інпута
+  countryInfo.innerHTML = '';
+  countryList.innerHTML = '';
+
   if (inputValue.length === 0) return; // onFetchError();
 
   fetchCountries(inputValue)
@@ -78,7 +82,6 @@ function markupSelectionCountries(data) {
     onFetchInfo();
   }
 }
-
 //*================= виводимо помилки ================================
 function onFetchInfo() {
   Notify.info('Too many matches found. Please enter a more specific name.');
@@ -90,9 +93,6 @@ function onFetchError() {
 
 //*==================== розмітка для одної або 10 країн ==============
 function createMarkupCountriInfo(arr) {
-  //* очищаємо сторінку перед новим пошуком
-  countryList.innerHTML = '';
-
   const markup = arr
     .map(({ name, flags, capital, population, languages }) => {
       // console.log(el);
@@ -113,9 +113,6 @@ function createMarkupCountriInfo(arr) {
 }
 
 function createMarkupCountries(arr) {
-  //* очищаємо сторінку перед новим пошуком
-  countryInfo.innerHTML = '';
-
   const markup = arr
     .map(({ name, flags }) => {
       // console.log(el);
@@ -128,3 +125,4 @@ function createMarkupCountries(arr) {
 
   countryList.innerHTML = markup;
 }
+//?==============================================================
