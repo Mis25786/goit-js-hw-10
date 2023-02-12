@@ -65,6 +65,7 @@ function onLookingForCountry(e) {
   countryInfo.innerHTML = '';
   countryList.innerHTML = '';
 
+  //* якщо порожній рядок запит не робимо
   if (inputValue.length === 0) return; // onFetchError();
 
   fetchCountries(inputValue)
